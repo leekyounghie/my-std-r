@@ -31,7 +31,12 @@ export default class Task extends Component {
           onClick={this.toggleChecked.bind(this)}
         />
 
-        <span className="text">{this.props.task.text}</span>
+        {/* 아래 3줄추가 = text 앞에 username을 보여준다 */}
+       <span className="text">
+         <strong>{this.props.task.username}</strong>: {this.props.task.text}
+       </span>
+       {/* 여기까지 추가  */}
+       
       </li>
     );
   }

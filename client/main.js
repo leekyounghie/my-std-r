@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { Meteor } from 'meteor/meteor';
 import { render } from 'react-dom';
 
+import '../imports/startup/accounts-config.js'; // 여기 추가
 import App from '../imports/ui/App.jsx';
 
 Meteor.startup(() => {

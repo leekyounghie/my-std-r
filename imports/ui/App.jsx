@@ -1,10 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
+import { Meteor } from 'meteor/meteor';   // 여기 추가
 import { createContainer } from 'meteor/react-meteor-data';
 
 import { Tasks } from '../api/tasks.js';
 
 import Task from './Task.jsx';
+import AccountsUIWrapper from './AccountsUIWrapper.jsx';
 
 // App compo => 예제 앱 전체를 여기에 정의
 class App extends Component {
@@ -33,6 +35,8 @@ class App extends Component {
     Tasks.insert({
       text,
       createdAt: new Date(), // current time
+      owner: Meteor.userId(),          // 여기 추가  id of logged in user <==
+      username: Meteor.user().username // 여기 추가  username of logged in user <==
     });
 
     // DB instert 후 폼에 있는 값을 ''로 지위줌
@@ -55,7 +59,7 @@ class App extends Component {
     return (
       <div className="container">
         <header>
-          <h1>Todo List:7.Temp UI state({this.props.incompleteCount})</h1>
+          <h1>Todo List:8.User Acc. ({this.props.incompleteCount})</h1>
 
             <label className="hide-completed">
                 <input
@@ -67,11 +71,19 @@ class App extends Component {
                 Hide Completed Tasks
             </label>
 
-          <form className="new-task" onSubmit={this.handleSubmit.bind(this)} >
-            <input  type="text"  ref="textInput"
-              placeholder="Type to add new tasks"
-            />
-          </form>
+          <AccountsUIWrapper />  {/* 여기 추가 compo tag here  */}
+
+    {/* 아래 코드 추가 = 로그인 이후에 보임 */}
+          { this.props.currentUser ?
+              <form className="new-task" onSubmit={this.handleSubmit.bind(this)} >
+                <input
+                  type="text"
+                  ref="textInput"
+                  placeholder="Type to add new tasks"
+                />
+              </form> : ''
+          }
+    {/* 여기까지 = 로그인 이후에 보임  */}
 
         </header>
 
@@ -83,12 +95,14 @@ class App extends Component {
 
 App.propTypes = {
   tasks: PropTypes.array.isRequired,
-  incompleteCount: PropTypes.number.isRequired, // 코드 추가
+  incompleteCount: PropTypes.number.isRequired,
+  currentUser: PropTypes.object,  // 여기 추가. 데이터 형식이 object 임을 정의 <==
 };
 
 export default createContainer(() => {
   return {
       tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
-      incompleteCount: Tasks.find({ checked: { $ne: true } }).count(),  // 코드 추가
+      incompleteCount: Tasks.find({ checked: { $ne: true } }).count(),
+      currentUser: Meteor.user(),  // 여기 추가. App compo 에서 사용하도록 등록 <==
   };
 }, App);
